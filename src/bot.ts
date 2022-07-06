@@ -88,17 +88,13 @@ class Bot {
 
     try {
       const start = Date.now();
-      const res = await this.axiosInstace.post("/mongo-create", data);
+      const res = await this.axiosInstace.post("/create", data);
       const duration = Date.now() - start;
 
       if (res.status == 200) {
         this.numberCreateSuccess++;
         this.totalCreateTime += duration;
         this.productId.push(res.data);
-
-        //console.log(
-        //  `Create product successfully with execution time ${duration}`
-        //);
       }
     } catch (error) {
       console.log(error.code);
@@ -118,10 +114,6 @@ class Bot {
       if (res.status == 200) {
         this.numberReadSuccess++;
         this.totalReadTime += duration;
-
-        //console.log(
-        //  `Read product successfully with execution time ${duration}`
-        //);
       }
     } catch (error) {
       console.log(error.code);
@@ -130,7 +122,6 @@ class Bot {
   }
 
   async start() {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const listPromise = [];
     for (let i = 0; i < this.numberReadPerSecond; i++) {
       listPromise.push(this.readProduct());

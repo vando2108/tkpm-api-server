@@ -42,7 +42,7 @@ export class Server {
     const numberRep = dataSource.getRepository(NumberValue);
 
     this.app.post("/mongo-create", async (req, res) => {
-      const { name, desc, price, attributes } = req.body;
+      let { name, desc, price, attributes } = req.body;
 
       try {
         const product = await this.product.create({
@@ -67,16 +67,18 @@ export class Server {
           );
         }
 
+        [name, desc, price, attributes] = [null, null, null, null];
         res.send(product.id);
       } catch (error) {
         res.status(400);
+        [name, desc, price, attributes] = [null, null, null, null];
         return;
       }
     });
 
     this.app.post("/create", async (req, res) => {
       console.log("create product");
-      const { name, desc, price, attributes } = req.body;
+      let { name, desc, price, attributes } = req.body;
 
       const product = new Product(name, desc, price);
       try {
@@ -103,9 +105,11 @@ export class Server {
             }
           );
         }
+        [name, desc, price, attributes] = [null, null, null, null];
         res.send(product.id);
       } catch (error) {
         console.log(error);
+        [name, desc, price, attributes] = [null, null, null, null];
         res.status(400);
         return;
       }
@@ -125,6 +129,8 @@ export class Server {
         const productAttrbutes = await this.attribute.find({
           productId: product.id,
         });
+
+        product = null;
 
         res.send({
           product,
