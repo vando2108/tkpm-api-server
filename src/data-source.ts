@@ -12,7 +12,7 @@ export const dataSource = new DataSource({
   password: "secret",
   database: "tkpm",
   synchronize: true,
-  logging: false,
+  logging: true,
   entities: [Attribute, StringValue, NumberValue, Product],
   migrations: [],
   subscribers: [],

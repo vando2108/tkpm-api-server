@@ -36,8 +36,12 @@ class Bot {
     this.numberReadPerSecond = numberReadPerSecond;
     this.numberCreatePerSecond = numberCreatePerSecond;
 
+    //this.axiosInstace = axios.default.create({
+    //  baseURL: "http://52.221.157.124:4000",
+    //  timeout,
+    //});
     this.axiosInstace = axios.default.create({
-      baseURL: "http://52.221.157.124:4000",
+      baseURL: "http://localhost:8765",
       timeout,
     });
   }
@@ -97,7 +101,7 @@ class Bot {
         //);
       }
     } catch (error) {
-      //console.log(error);
+      console.log(error.code);
       this.numberCreateErr++;
     }
   }
@@ -120,7 +124,7 @@ class Bot {
         //);
       }
     } catch (error) {
-      //console.log(error);
+      console.log(error.code);
       this.numberReadErr++;
     }
   }

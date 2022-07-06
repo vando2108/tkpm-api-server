@@ -48,6 +48,7 @@ export class Server {
     //});
 
     this.app.post("/create", async (req, res) => {
+      console.log("create product");
       const { name, desc, price, attributes } = req.body;
 
       const product = new Product(name, desc, price);
@@ -84,6 +85,7 @@ export class Server {
     });
 
     this.app.get("/read", async (req, res) => {
+      console.log("read product");
       try {
         let product: any;
         if (req.query.productId != "undefined")
