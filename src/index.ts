@@ -53,50 +53,34 @@ export class Server {
       const product = new Product(name, desc, price);
       try {
         await productRep.save(product);
+        if (attributes) {
+          attributes.forEach(
+            async (item: { name: string; type: string; value: any }) => {
+              const attribute = new Attribute(product.id, item.name);
+              await attributeRep.save(attribute);
+
+              switch (item.type) {
+                case "string": {
+                  const value = new StringValue(attribute.id, item.value);
+                  await stringRep.save(value);
+                  break;
+                }
+
+                case "number": {
+                  const value = new NumberValue(attribute.id, item.value);
+                  await numberRep.save(value);
+                  break;
+                }
+              }
+            }
+          );
+        }
+        res.send(product.id);
       } catch (error) {
+        console.log(error);
         res.status(400);
         return;
       }
-
-      if (attributes) {
-        attributes.forEach(
-          async (item: { name: string; type: string; value: any }) => {
-            const attribute = new Attribute(product.id, item.name);
-            try {
-              await attributeRep.save(attribute);
-            } catch (error) {
-              res.status(400);
-              return;
-            }
-
-            switch (item.type) {
-              case "string": {
-                const value = new StringValue(attribute.id, item.value);
-                try {
-                  await stringRep.save(value);
-                } catch (error) {
-                  res.status(400);
-                  return;
-                }
-                break;
-              }
-
-              case "number": {
-                const value = new NumberValue(attribute.id, item.value);
-                try {
-                  await numberRep.save(value);
-                } catch (error) {
-                  res.status(400);
-                  return;
-                }
-                break;
-              }
-            }
-          }
-        );
-      }
-
-      res.send(product.id);
     });
 
     this.app.get("/read", async (req, res) => {
@@ -118,11 +102,12 @@ export class Server {
           productAttrbutes,
         });
       } catch (error) {
+        console.log(error);
         res.status(400);
       }
     });
 
-    this.app.listen(process.env.PORT || 4000, () => {
+    this.app.listen(process.env.PORT || 8080, () => {
       console.log(`Server is running in port ${process.env.PORT || 4000}`);
     });
   }

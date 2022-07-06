@@ -37,7 +37,7 @@ class Bot {
     this.numberCreatePerSecond = numberCreatePerSecond;
 
     this.axiosInstace = axios.default.create({
-      baseURL: "http://localhost:4000",
+      baseURL: "http://52.221.157.124:4000",
       timeout,
     });
   }
@@ -142,5 +142,5 @@ class Bot {
   }
 }
 
-const bot = new Bot(10000, 100000, 100);
+const bot = new Bot(10000, 10000, 1);
 bot.start();
