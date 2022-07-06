@@ -36,14 +36,14 @@ class Bot {
     this.numberReadPerSecond = numberReadPerSecond;
     this.numberCreatePerSecond = numberCreatePerSecond;
 
-    //this.axiosInstace = axios.default.create({
-    //  baseURL: "http://52.221.157.124:4000",
-    //  timeout,
-    //});
     this.axiosInstace = axios.default.create({
-      baseURL: "http://localhost:8765",
+      baseURL: "http://52.221.157.124:8765",
       timeout,
     });
+    //this.axiosInstace = axios.default.create({
+    //  baseURL: "http://localhost:8765",
+    //  timeout,
+    //});
   }
 
   log() {
@@ -146,5 +146,5 @@ class Bot {
   }
 }
 
-const bot = new Bot(10000, 10000, 1);
+const bot = new Bot(100000, 5000, 1);
 bot.start();
