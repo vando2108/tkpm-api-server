@@ -41,11 +41,38 @@ export class Server {
     const stringRep = dataSource.getRepository(StringValue);
     const numberRep = dataSource.getRepository(NumberValue);
 
-    //this.app.post("/mongo-create", async (req, res) => {
-    //  const { name, desc, price, attributes } = req.body;
+    this.app.post("/mongo-create", async (req, res) => {
+      const { name, desc, price, attributes } = req.body;
 
-    //  this.product.create();
-    //});
+      try {
+        const product = await this.product.create({
+          name,
+          desc,
+          price,
+        });
+
+        if (attributes) {
+          attributes.forEach(
+            async (item: {
+              name: string;
+              type: string;
+              value: number | string;
+            }) => {
+              await this.attribute.create({
+                productId: product.id,
+                name: item.name,
+                value: item.value,
+              });
+            }
+          );
+        }
+
+        res.send(product.id);
+      } catch (error) {
+        res.status(400);
+        return;
+      }
+    });
 
     this.app.post("/create", async (req, res) => {
       console.log("create product");

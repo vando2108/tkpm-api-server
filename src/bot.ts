@@ -88,7 +88,7 @@ class Bot {
 
     try {
       const start = Date.now();
-      const res = await this.axiosInstace.post("/create", data);
+      const res = await this.axiosInstace.post("/mongo-create", data);
       const duration = Date.now() - start;
 
       if (res.status == 200) {
@@ -130,21 +130,19 @@ class Bot {
   }
 
   async start() {
-    while (1) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const listPromise = [];
-      for (let i = 0; i < this.numberReadPerSecond; i++) {
-        listPromise.push(this.readProduct());
-      }
-      for (let i = 0; i < this.numberCreatePerSecond; i++) {
-        listPromise.push(this.createProduct());
-      }
-      await Promise.all(listPromise);
-
-      this.log();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const listPromise = [];
+    for (let i = 0; i < this.numberReadPerSecond; i++) {
+      listPromise.push(this.readProduct());
     }
+    for (let i = 0; i < this.numberCreatePerSecond; i++) {
+      listPromise.push(this.createProduct());
+    }
+    await Promise.all(listPromise);
+
+    this.log();
   }
 }
 
-const bot = new Bot(100000, 5000, 1);
+const bot = new Bot(100000, 1, 1);
 bot.start();
