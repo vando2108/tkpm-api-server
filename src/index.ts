@@ -13,6 +13,9 @@ export class Server {
   app: Express;
   product: mongoose.Model<model.Product>;
   attribute: mongoose.Model<model.Attribute>;
+  attributeSet: mongoose.Model<model.AttributeSet>;
+  stringValue: mongoose.Model<model.StringValue>;
+  numberValue: mongoose.Model<model.NumberValue>;
   mode: number;
 
   constructor(mode: number) {
@@ -31,6 +34,12 @@ export class Server {
 
     this.product = mongoose.model("product", model.ProductSchema);
     this.attribute = mongoose.model("prod_att", model.AttributeSchema);
+    this.attributeSet = mongoose.model(
+      "attribute_set",
+      model.AttributeSetSchema
+    );
+    this.stringValue = mongoose.model("string_value", model.StringValueSchema);
+    this.numberValue = mongoose.model("number_value", model.NumberValueSchema);
   }
 
   async start() {
@@ -42,7 +51,7 @@ export class Server {
     const numberRep = dataSource.getRepository(NumberValue);
 
     this.app.post("/mongo-create", async (req, res) => {
-      let { name, desc, price, attributes } = req.body;
+      const { name, desc, price, attributes } = req.body;
 
       try {
         const product = await this.product.create({
@@ -58,31 +67,45 @@ export class Server {
               type: string;
               value: number | string;
             }) => {
-              await this.attribute.create({
-                productId: product.id,
+              const attribute = await this.attributeSet.create({
+                productId: product._id.toString(),
                 name: item.name,
-                value: item.value,
               });
+
+              switch (item.type) {
+                case "string": {
+                  await this.stringValue.create({
+                    attributeId: attribute._id.toString(),
+                    value: item.value,
+                  });
+                  break;
+                }
+
+                case "number": {
+                  await this.numberValue.create({
+                    attributeId: attribute._id.toString(),
+                    value: item.value,
+                  });
+                  break;
+                }
+              }
             }
           );
         }
-
-        [name, desc, price, attributes] = [null, null, null, null];
         res.send(product.id);
       } catch (error) {
-        res.status(400);
-        [name, desc, price, attributes] = [null, null, null, null];
-        return;
+        console.log(error);
+        res.send();
       }
     });
 
     this.app.post("/create", async (req, res) => {
-      console.log("create product");
-      let { name, desc, price, attributes } = req.body;
+      const { name, desc, price, attributes } = req.body;
 
       const product = new Product(name, desc, price);
       try {
         await productRep.save(product);
+
         if (attributes) {
           attributes.forEach(
             async (item: { name: string; type: string; value: any }) => {
@@ -105,18 +128,17 @@ export class Server {
             }
           );
         }
-        [name, desc, price, attributes] = [null, null, null, null];
+
         res.send(product.id);
       } catch (error) {
         console.log(error);
-        [name, desc, price, attributes] = [null, null, null, null];
         res.status(400);
+        res.send();
         return;
       }
     });
 
     this.app.get("/read", async (req, res) => {
-      console.log("read product");
       try {
         let product: any;
         if (req.query.productId != "undefined")
@@ -130,15 +152,11 @@ export class Server {
           productId: product.id,
         });
 
-        product = null;
-
-        res.send({
-          product,
-          productAttrbutes,
-        });
+        res.send();
       } catch (error) {
         console.log(error);
         res.status(400);
+        res.send();
       }
     });
 

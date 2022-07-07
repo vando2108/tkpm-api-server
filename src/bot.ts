@@ -36,14 +36,14 @@ class Bot {
     this.numberReadPerSecond = numberReadPerSecond;
     this.numberCreatePerSecond = numberCreatePerSecond;
 
-    this.axiosInstace = axios.default.create({
-      baseURL: "http://52.221.157.124:8765",
-      timeout,
-    });
     //this.axiosInstace = axios.default.create({
-    //  baseURL: "http://localhost:8765",
+    //  baseURL: "http://52.221.157.124:8765",
     //  timeout,
     //});
+    this.axiosInstace = axios.default.create({
+      baseURL: "http://localhost:8765",
+      timeout,
+    });
   }
 
   log() {
@@ -62,7 +62,7 @@ class Bot {
   }
 
   async createProduct() {
-    const numberAttributes = Math.floor(Math.random() * 10);
+    const numberAttributes = Math.floor(Math.random() * 2 + 1);
     const attributes = [];
 
     for (let i = 0; i < numberAttributes; i++) {
@@ -88,7 +88,8 @@ class Bot {
 
     try {
       const start = Date.now();
-      const res = await this.axiosInstace.post("/create", data);
+      console.log(data);
+      const res = await this.axiosInstace.post("/mongo-create", data);
       const duration = Date.now() - start;
 
       if (res.status == 200) {
@@ -97,7 +98,7 @@ class Bot {
         this.productId.push(res.data);
       }
     } catch (error) {
-      console.log(error.code);
+      console.log(error);
       this.numberCreateErr++;
     }
   }
@@ -116,7 +117,7 @@ class Bot {
         this.totalReadTime += duration;
       }
     } catch (error) {
-      console.log(error.code);
+      console.log(error);
       this.numberReadErr++;
     }
   }
@@ -135,5 +136,5 @@ class Bot {
   }
 }
 
-const bot = new Bot(100000, 1, 1);
+const bot = new Bot(100000, 10000, 5000);
 bot.start();
