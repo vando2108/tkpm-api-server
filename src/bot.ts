@@ -136,5 +136,5 @@ class Bot {
   }
 }
 
-const bot = new Bot(100000, 10000, 5000);
+const bot = new Bot(100000, 1, 1);
 bot.start();

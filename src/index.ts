@@ -9,6 +9,19 @@ import mongoose from "mongoose";
 
 dotenv.config();
 
+function create_UUID() {
+  var dt = new Date().getTime();
+  var uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+    /[xy]/g,
+    function (c) {
+      var r = (dt + Math.random() * 16) % 16 | 0;
+      dt = Math.floor(dt / 16);
+      return (c == "x" ? r : (r & 0x3) | 0x8).toString(16);
+    }
+  );
+  return uuid;
+}
+
 export class Server {
   app: Express;
   product: mongoose.Model<model.Product>;
@@ -55,6 +68,7 @@ export class Server {
 
       try {
         const product = await this.product.create({
+          id: create_UUID(),
           name,
           desc,
           price,
@@ -68,14 +82,15 @@ export class Server {
               value: number | string;
             }) => {
               const attribute = await this.attributeSet.create({
-                productId: product._id.toString(),
+                id: create_UUID(),
+                productId: product.id,
                 name: item.name,
               });
 
               switch (item.type) {
                 case "string": {
                   await this.stringValue.create({
-                    attributeId: attribute._id.toString(),
+                    attributeId: attribute.id,
                     value: item.value,
                   });
                   break;
@@ -83,7 +98,7 @@ export class Server {
 
                 case "number": {
                   await this.numberValue.create({
-                    attributeId: attribute._id.toString(),
+                    attributeId: attribute.id,
                     value: item.value,
                   });
                   break;
